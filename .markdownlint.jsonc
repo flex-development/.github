@@ -31,12 +31,12 @@
     "maximum": 1
   },
   "MD013": {
-    "code_block_line_length": 80,
+    "code_block_line_length": 120,
     "code_blocks": true,
     "headers": true,
-    "heading_line_length": 80,
+    "heading_line_length": 120,
     "headings": true,
-    "line_length": 80,
+    "line_length": 120,
     "stern": false,
     "strict": false,
     "tables": false

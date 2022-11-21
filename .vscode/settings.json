@@ -6,7 +6,17 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[markdown]": {
-    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
+    "editor.rulers": [
+      {
+        // microsoft/vscode#166261
+        "color": "var(--vscode-editorRuler-foreground)",
+        "column": 120
+      }
+    ],
+    "editor.wordWrap": "wordWrapColumn",
+    "editor.wordWrapColumn": 120,
+    "rewrap.wrappingColumn": 120
   },
   "[yaml]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",

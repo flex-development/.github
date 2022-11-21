@@ -17,6 +17,7 @@ gpgsign
 hmarr
 micnncim
 safecrlf
+solutionist
 syncer
 vsicons
 yarnrc
