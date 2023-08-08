@@ -23,6 +23,7 @@ branches:
         checks:
           - context: auto-merge
           - context: commitlint
+          - context: dependabot-auto
           - context: format
           - context: gitguardian
           - context: lint
