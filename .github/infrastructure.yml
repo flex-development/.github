@@ -21,6 +21,7 @@ branches:
         required_approving_review_count: 1
       required_status_checks:
         checks:
+          - context: auto-merge
           - context: commitlint
           - context: format
           - context: gitguardian
