@@ -2,10 +2,22 @@
 #
 # References:
 #
+# - https://docs.github.com/actions/learn-github-actions/contexts
+# - https://docs.github.com/actions/learn-github-actions/expressions
+# - https://docs.github.com/actions/using-jobs/using-a-matrix-for-your-jobs
 # - https://docs.github.com/actions/using-workflows/events-that-trigger-workflows#pull_request
 # - https://docs.github.com/actions/using-workflows/events-that-trigger-workflows#push
 # - https://docs.github.com/actions/using-workflows/events-that-trigger-workflows#workflow_dispatch
+# - https://docs.github.com/actions/using-workflows/workflow-commands-for-github-actions
+# - https://docs.github.com/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
+# - https://docs.github.com/webhooks-and-events/webhooks/webhook-events-and-payloads#push
+# - https://docs.github.com/webhooks-and-events/webhooks/webhook-events-and-payloads#workflow_dispatch
+# - https://github.com/GitGuardian/ggshield-action
+# - https://github.com/actions/cache
+# - https://github.com/actions/cache/discussions/650
 # - https://github.com/actions/checkout
+# - https://github.com/actions/setup-node
+# - https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#yarn2-configuration
 # - https://github.com/hmarr/debug-action
 
 ---
@@ -17,46 +29,185 @@ on:
       - feat/**
       - hotfix/**
       - main
+      - release/**
   workflow_dispatch:
 permissions:
+  contents: read
   packages: read
 env:
+  CACHE_PATH: node_modules
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   HUSKY: 0
-  REF: ${{ github.head_ref || github.ref_name }}
+  REF: ${{ github.head_ref || github.ref }}
+  REF_NAME: ${{ github.head_ref || github.ref_name }}
+  SHA: ${{ github.event.pull_request.head.sha || github.sha }}
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
 jobs:
-  ci:
+  preflight:
     if: |
-      github.event_name == 'pull_request' ||
-      github.event_name == 'workflow_dispatch' ||
-      !startsWith(github.event.head_commit.message, 'release:')
+      github.event.head_commit.author.name != 'dependabot[bot]'
+      && github.event.head_commit.author.username != 'flexdevelopment'
+      && !startsWith(github.event.head_commit.message, 'release:')
     runs-on: ubuntu-latest
     steps:
       - id: debug
         name: Print environment variables and event payload
         uses: hmarr/debug-action@v2.1.0
       - id: checkout
-        name: Checkout ${{ env.REF }}
-        uses: actions/checkout@v3.1.0
+        name: Checkout ${{ env.REF_NAME }}
+        uses: actions/checkout@v3.5.3
         with:
+          persist-credentials: false
           ref: ${{ env.REF }}
+      - id: node
+        name: Setup Node.js
+        uses: actions/setup-node@v3.7.0
+        with:
+          cache: yarn
+          cache-dependency-path: yarn.lock
+          node-version-file: .nvmrc
       - id: yarn
         name: Install dependencies
-        if: github.actor != 'dependabot[bot]'
-        run: yarn
-      - id: yarn-dependabot
-        name: Install dependencies for dependabot
-        if: github.actor == 'dependabot[bot]'
-        run: yarn --no-immutable
+        run: yarn ${{ github.actor == 'dependabot[bot]' && '--no-immutable' || '--immutable' }}
+      - id: cache
+        name: Cache dependencies
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-${{ github.run_id }}
+          path: ${{ env.CACHE_PATH }}
+  commitlint:
+    needs: preflight
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout
+        name: Checkout ${{ env.REF_NAME }}
+        uses: actions/checkout@v3.5.3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ env.REF }}
+      - id: node
+        name: Setup Node.js
+        uses: actions/setup-node@v3.7.0
+        with:
+          cache: yarn
+          cache-dependency-path: yarn.lock
+          node-version-file: .nvmrc
+      - id: cache
+        name: Restore dependencies cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-${{ github.run_id }}
+          path: ${{ env.CACHE_PATH }}
+      - id: lint
+        name: Check commitlint status
+        if: github.run_number != '1'
+        run: yarn commitlint --from $SHA~${{ github.event.pull_request.commits || 1 }} --to $SHA
+  gitguardian:
+    needs: commitlint
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout
+        name: Checkout ${{ env.REF_NAME }}
+        uses: actions/checkout@v3.5.3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ env.REF }}
+      - id: scan
+        name: Scan commits for secrets and policy breaches
+        uses: GitGuardian/ggshield-action@master
+        with:
+          args: --all-policies --show-secrets --verbose
+        env:
+          GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
+          GITHUB_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          GITHUB_PULL_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          GITHUB_PUSH_BASE_SHA: ${{ github.event.base }}
+          GITHUB_PUSH_BEFORE_SHA: ${{ github.event.before }}
+  format:
+    needs:
+      - commitlint
+      - gitguardian
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout
+        name: Checkout ${{ env.REF_NAME }}
+        uses: actions/checkout@v3.5.3
+        with:
+          persist-credentials: false
+          ref: ${{ env.REF }}
+      - id: node
+        name: Setup Node.js
+        uses: actions/setup-node@v3.7.0
+        with:
+          cache: yarn
+          cache-dependency-path: yarn.lock
+          node-version-file: .nvmrc
+      - id: cache
+        name: Restore dependencies cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-${{ github.run_id }}
+          path: ${{ env.CACHE_PATH }}
       - id: format
         name: Check code formatting
         run: yarn check:format
+  lint:
+    needs:
+      - commitlint
+      - gitguardian
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout
+        name: Checkout ${{ env.REF_NAME }}
+        uses: actions/checkout@v3.5.3
+        with:
+          persist-credentials: false
+          ref: ${{ env.REF }}
+      - id: node
+        name: Setup Node.js
+        uses: actions/setup-node@v3.7.0
+        with:
+          cache: yarn
+          cache-dependency-path: yarn.lock
+          node-version-file: .nvmrc
+      - id: cache
+        name: Restore dependencies cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-${{ github.run_id }}
+          path: ${{ env.CACHE_PATH }}
       - id: lint
         name: Check lint status
         run: yarn check:lint
+  spelling:
+    needs:
+      - commitlint
+      - gitguardian
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout
+        name: Checkout ${{ env.REF_NAME }}
+        uses: actions/checkout@v3.5.3
+        with:
+          persist-credentials: false
+          ref: ${{ env.REF }}
+      - id: node
+        name: Setup Node.js
+        uses: actions/setup-node@v3.7.0
+        with:
+          cache: yarn
+          cache-dependency-path: yarn.lock
+          node-version-file: .nvmrc
+      - id: cache
+        name: Restore dependencies cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-${{ github.run_id }}
+          path: ${{ env.CACHE_PATH }}
       - id: spelling
         name: Check spelling
         run: yarn check:spelling

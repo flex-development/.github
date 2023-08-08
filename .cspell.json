@@ -13,26 +13,34 @@
   "failFast": false,
   "flagWords": [],
   "ignorePaths": [
-    "**/.gitignore",
-    "**/.gitkeep",
+    "**/*.log",
+    "**/*.patch",
+    "**/*.snap",
+    "**/.*ignore",
+    "**/.gitconfig",
+    "**/CHANGELOG.md",
+    "**/LICENSE.md",
+    "**/RELEASE_NOTES.md",
     ".cspell.json",
-    ".eslintignore",
+    ".dictionary.txt",
     ".git/",
     ".husky/_/",
-    ".markdownlintignore",
-    ".nvmrc",
-    ".prettierignore",
+    ".vscode/settings.json",
     ".yarn/",
+    "dist/",
     "patches/",
     "yarn.lock"
   ],
-  "ignoreRegExpList": [],
+  "ignoreRegExpList": [
+    "/@flex-development\\/.*/",
+    "/from\\s+(['\"]).*\\1/",
+    "import\\(.*\\)"
+  ],
   "ignoreWords": [],
   "language": "en-US",
   "patterns": [],
   "readonly": true,
   "useGitignore": true,
   "usePnP": false,
-  "version": "0.2",
-  "words": []
+  "version": "0.2"
 }

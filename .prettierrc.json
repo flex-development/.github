@@ -1,6 +1,7 @@
 {
   "arrowParens": "avoid",
   "bracketSpacing": true,
+  "plugins": ["prettier-plugin-sh"],
   "proseWrap": "always",
   "quoteProps": "as-needed",
   "semi": false,
@@ -8,20 +9,25 @@
   "overrides": [
     {
       "files": [
-        "*.sh",
-        "*.txt",
+        "**/*.sh",
+        "**/*.txt",
+        "**/.*ignore",
+        "**/.*rc",
+        "**/.env*",
+        "**/.eslintcache",
+        "**/.git*",
         ".editorconfig",
-        ".env*",
         ".husky/commit-msg",
         ".husky/pre-commit",
-        ".husky/pre-push"
+        ".husky/pre-push",
+        "Brewfile"
       ],
       "options": {
-        "functionNextLine": true,
+        "functionNextLine": false,
         "keepComments": true,
         "keepPadding": false,
         "parser": "sh",
-        "spaceRedirects": true,
+        "spaceRedirects": false,
         "switchCaseIndent": true,
         "variant": 0
       }

@@ -1,10 +1,11 @@
 # macOS
 # ------------------------------------------------------------------------------
-.DS_*
-._*
+**/._*
+**/.DS_*
 
 # Node
 # ------------------------------------------------------------------------------
+**/node_modules/
 *.log
 *.pid
 *.pid.lock
@@ -14,12 +15,12 @@
 .npm
 .yarn-integrity
 logs
-node_modules/
 npm-debug.log*
 pids
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 yarn-debug.log*
 yarn-error.log*
+!**/__fixtures__/**/node_modules/
 
 # Yarn 2 (Not using Zero-Installs)
 # https://yarnpkg.com/getting-started/qa#which-files-should-be-gitignored
@@ -31,6 +32,45 @@ yarn-error.log*
 !.yarn/sdks
 !.yarn/versions
 
+# Environment
+# ------------------------------------------------------------------------------
+**/.env
+**/.env*.local
+**/.env.repo
+
+# TypeScript
+# ------------------------------------------------------------------------------
+*.tsbuildinfo
+
+# Testing
+# ------------------------------------------------------------------------------
+**/*config.*.timestamp*
+**/__tests__/report.json
+**/coverage/
+**/tsconfig*temp.json
+*.lcov
+codecov
+
 # ESLint
 # ------------------------------------------------------------------------------
-.eslintcache
+**/.eslintcache
+
+# Builds
+# ------------------------------------------------------------------------------
+**/.temp/
+**/dist/
+!**/__fixtures__/**/*.log
+!**/__fixtures__/**/dist/
+!**/typings/**/dist/
+
+# Releases
+# ------------------------------------------------------------------------------
+**/RELEASE_NOTES.md
+
+# Vercel
+# ------------------------------------------------------------------------------
+**/.vercel/
+
+# Misc
+# ------------------------------------------------------------------------------
+**/scratch.*
