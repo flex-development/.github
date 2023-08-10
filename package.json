@@ -26,7 +26,7 @@
     "postinstall": "[ -f ./node_modules/.bin/husky ] && chmod +x .husky/* && husky install || exit 0"
   },
   "devDependencies": {
-    "@commitlint/cli": "17.6.7",
+    "@commitlint/cli": "17.7.0",
     "@commitlint/types": "17.4.4",
     "@flex-development/commitlint-config": "1.0.1",
     "@graphql-eslint/eslint-plugin": "3.20.1",
