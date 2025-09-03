@@ -1,10 +1,10 @@
-# :mechanical_arm: Flex Development
+# \:mechanical\_arm: Flex Development
 
 > **Doing the heavy lifting so you don't have to 😉**
 
 <br/>
 
-I'm Lex ([@unicornware][1]), a self-taught UI designer, full stack engineer, and software developer 👋🏾
+I'm Lex ([@unicornware][unicornware]), a self-taught UI designer, full stack engineer, and software developer 👋🏾
 
 A self-proclaimed digital solutionist, I'm also the brains and brawn behind Flex Development, a design and development
 company dedicated to crafting high quality digital products.
@@ -21,11 +21,12 @@ What we can create together:
 - Web APIs and custom backend integrations
 - Custom software packages
 
-Don't see what you're looking for? No worries. **If you can dream it, I can build it. :brown_heart:**
+Don't see what you're looking for? No worries. **If you can dream it, I can build it. \:brown\_heart:**
 
-## :stuck_out_tongue_winking_eye: Start a Project
+## \:stuck\_out\_tongue\_winking\_eye: Start a Project
 
-Ready to start your next project? Send an email to [`hello@flexdevelopment.llc`][2] so we can get started!
+Ready to start your next project? Send an email to [`hello@flexdevelopment.llc`][hello] so we can get started!
 
-[1]: https://github.com/unicornware
-[2]: mailto:hello@flexdevelopment.llc
+[hello]: mailto:hello@flexdevelopment.llc
+
+[unicornware]: https://github.com/unicornware

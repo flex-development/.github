@@ -13,9 +13,10 @@
   "failFast": false,
   "flagWords": [],
   "ignorePaths": [
-    "**/*.log",
     "**/*.patch",
     "**/*.snap",
+    "**/*.svg",
+    "**/*.wasm",
     "**/.*ignore",
     "**/.gitconfig",
     "**/CHANGELOG.md",
@@ -27,7 +28,6 @@
     ".husky/_/",
     ".vscode/settings.json",
     ".yarn/",
-    "dist/",
     "patches/",
     "yarn.lock"
   ],

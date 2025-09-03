@@ -1,7 +1,0 @@
-{
-  "*": ["prettier --check", "cspell lint --color --no-progress --relative $@"],
-  "**/*.{cjs,cts,gql,js,json,json5,jsonc,md,mjs,mts,ts,yml}": [
-    "eslint --exit-on-fatal-error"
-  ],
-  "**/yarn.lock": "yarn dedupe --check"
-}
