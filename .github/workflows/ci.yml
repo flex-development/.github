@@ -92,7 +92,6 @@ jobs:
         run: |
           echo "result=${{ startsWith(github.head_ref || github.ref_name, 'release/') && steps.manifest-version.outputs.result || format('{0}+{1}', steps.manifest-version.outputs.result, github.event.pull_request.head.sha || github.sha) }}" >>$GITHUB_OUTPUT
   gitguardian:
-    needs: preflight
     runs-on: ubuntu-latest
     steps:
       - id: checkout
@@ -112,9 +111,7 @@ jobs:
         with:
           args: --all-policies --format sarif --show-secrets --with-incident-details --verbose
   commitlint:
-    needs:
-      - gitguardian
-      - preflight
+    needs: preflight
     runs-on: ubuntu-latest
     steps:
       - id: checkout
@@ -142,10 +139,7 @@ jobs:
         if: github.run_number != '1'
         run: yarn commitlint --from $SHA~${{ github.event.pull_request.commits || 1 }} --to $SHA
   format:
-    needs:
-      - commitlint
-      - gitguardian
-      - preflight
+    needs: preflight
     runs-on: ubuntu-latest
     steps:
       - id: checkout
@@ -178,10 +172,7 @@ jobs:
           config-path: .dprint.jsonc
           dprint-version: ${{ steps.version.outputs.result }}
   lint:
-    needs:
-      - commitlint
-      - gitguardian
-      - preflight
+    needs: preflight
     runs-on: ubuntu-latest
     steps:
       - id: checkout
@@ -210,10 +201,6 @@ jobs:
         name: Check eslint files
         run: yarn check:lint
   spelling:
-    needs:
-      - commitlint
-      - gitguardian
-      - preflight
     runs-on: ubuntu-latest
     steps:
       - id: checkout
